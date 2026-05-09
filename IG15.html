@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<h2>CFL IG15</h2>
+<p class="disclaimer">ALL DONNÉEËN & BERECHNUNGEN OUNI GARANTIE</p>
+
+<style>
+
+/* =========================
+   BASE LAYOUT
+========================= */
+
+body {
+    font-family: Arial;
+    background:#f4f6f8;
+    margin:0;
+    padding:16px;
+}
+
+.container {
+    max-width:900px;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+    background:white;
+    padding:18px;
+    border-radius:16px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+/* =========================
+   TYPO
+========================= */
+
+h2, h3 {
+    margin:0;
+}
+
+h2, h3 {
+    text-align: center;
+}
+
+.disclaimer {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+input, select {
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
+/* =========================
+   CUSTOM BOXES
+========================= */
+
+.custom-box {
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+    padding:14px;
+    border-radius:12px;
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+}
+
+/* =========================
+   EVENTS
+========================= */
+
+.event {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+
+    padding:14px;
+    border-radius:12px;
+    background:#fafafa;
+    border:1px solid #ddd;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:18px;
+    background:#2e7d32;
+    color:white;
+}
+
+.main-btn {
+    background:#6a1b9a;
+}
+
+.delete-btn {
+    margin-top:10px;
+    background:#b91c1c;
+    font-size:14px;
+    padding:10px;
+}
+
+/* =========================
+   FINAL OUTPUT
+========================= */
+
+#finalStart,
+#finalEnd {
+    margin:0;
+}
+
+/* =========================
+   DEBUG
+========================= */
+
+pre {
+    background:#0f172a;
+    color:#00ff88;
+    padding:15px;
+    border-radius:10px;
+    max-height:500px;
+    overflow:auto;
+    font-size:14px;
+}
+
+label {
+    font-weight:bold;
+}
+
+.hidden {
+    display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+
+<!-- =========================
+     VORTAG
+========================= -->
+<div class="card">
+<h3>SCHAFFZÄITEN VUM DAG VIRDRUN</h3>
+
+<label>Datum</label>
+<input id="prevDate" type="date">
+
+<label>Auerzäit</label>
+<select id="prevType">
+<option value="normal">Normalschicht (7–15)</option>
+<option value="mittag">Mëttegschicht (11–19)</option>
+<option value="custom">Benotzerdefinéiert</option>
+</select>
+
+
+<div id="prevCustomFields" class="custom-box hidden">
+    <label>UFANK</label>
+    <input id="prevStart" type="time">
+
+    <label>FEIEROWEND</label>
+    <input id="prevEnd" type="time">
+</div>
+
+</div>
+
+<!-- =========================
+     INTERVENTIONEN
+========================= -->
+<div class="card">
+
+<h3>AUERZÄITEN VUN STÖRUNGEN</h3>
+
+<div id="events"></div>
+
+<button onclick="addEvent()">+ STÖRUNG</button>
+
+</div>
+
+<!-- =========================
+     NÄCHSTER TAG
+========================= -->
+<div class="card">
+
+<h3>SCHAFFZÄITEN VUM DAG DROP</h3>
+
+<label>Datum</label>
+<input id="nextDate" type="date">
+
+<label>Auerzäit</label>
+<select id="nextType">
+<option value="normal">Normalschicht (7–15)</option>
+<option value="mittag">Mëttegschicht (11–19)</option>
+<option value="custom">Benotzerdefinéiert</option>
+</select>
+
+<div id="nextCustomFields" class="custom-box hidden">
+    <label>UFANK</label>
+    <input id="nextStart" type="time">
+
+    <label>FEIEROWEND</label>
+    <input id="nextEnd" type="time">
+</div>
+
+</div>
+
+<!-- =========================
+     BUTTON
+========================= -->
+<div class="card">
+<button class="main-btn" onclick="run()">✨BERECHNEN✨</button>
+</div>
+
+<!-- =========================
+     RESULT
+========================= -->
+<div class="card">
+<h3>UGEPASSTE SCHAFFZÄITEN</h3>
+
+<label>UFÄNKEN UM</label>
+<input id="finalStart" type="text" readonly>
+
+<label>FEIEROWEND</label>
+<input id="finalEnd" type="text" readonly>
+</div>
+
+<!-- =========================
+     DEBUG (optional sichtbar lassen)
+========================= -->
+<div class="card hidden" id="debugBox">
+<h3>DEBUG</h3>
+<pre id="log"></pre>
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+   HELPERS
+========================= */
+
+function toDate(d,t){
+    return new Date(d + "T" + t);
+}
+
+function addHours(d,h){
+    return new Date(d.getTime() + h*3600000);
+}
+
+function diffHours(a,b){
+    return (a-b)/3600000;
+}
+
+function shift(type){
+    if(type==="normal") return ["07:00","15:00"];
+    if(type==="mittag") return ["11:00","19:00"];
+    return [null,null];
+}
+
+/* =========================
+   UI
+========================= */
+
+function addEvent(){
+
+    let div = document.createElement("div");
+    div.className="event";
+
+    div.innerHTML=`
+        <label>START</label>
+        <input type="datetime-local" class="start">
+
+        <label>FÄERDEG (Doheem ukomm)</label>
+        <input type="datetime-local" class="end">
+
+        <button type="button" class="delete-btn" onclick="this.parentElement.remove()">
+            - STÖRUNG LÄSCHEN
+        </button>
+    `;
+
+    document.getElementById("events").appendChild(div);
+}
+function toggleCustomFields(){
+
+    document.getElementById("prevCustomFields").classList.toggle(
+        "hidden",
+        document.getElementById("prevType").value !== "custom"
+    );
+
+    document.getElementById("nextCustomFields").classList.toggle(
+        "hidden",
+        document.getElementById("nextType").value !== "custom"
+    );
+}
+
+function formatDuration(hours) {
+    const totalMinutes = Math.round(hours * 60);
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+
+    const hourText = h === 1 ? "Stonn" : "Stonnen";
+    const minuteText = m === 1 ? "Minutt" : "Minutten";
+
+    // Nur Stunden
+    if (m === 0) {
+        return `${h} ${hourText}`;
+    }
+
+    // Nur Minuten
+    if (h === 0) {
+        return `${m} ${minuteText}`;
+    }
+
+    // Stunden + Minuten
+    return `${h} ${hourText} an ${m} ${minuteText}`;
+}
+
+
+/* =========================
+   ENGINE (UNVERÄNDERT)
+========================= */
+
+function run() {
+
+    let inputValid = true;
+    let dispenseComplet = false;
+    let log = [];
+
+    /* DEBUG sichtbar machen */
+    document.getElementById("debugBox").classList.remove("hidden");
+
+    /* =========================
+       INPUTS
+    ========================= */
+
+    let prevDate = document.getElementById("prevDate").value;
+    let nextDate = document.getElementById("nextDate").value;
+
+    let prevType = document.getElementById("prevType").value;
+    let nextType = document.getElementById("nextType").value;
+
+    let [pS, pE] = shift(prevType);
+    let [nS, nE] = shift(nextType);
+
+    let prevEnd = prevType === "custom"
+        ? toDate(prevDate, document.getElementById("prevEnd").value)
+        : toDate(prevDate, pE);
+
+    let nextPlannedStart = nextType === "custom"
+        ? toDate(nextDate, document.getElementById("nextStart").value)
+        : toDate(nextDate, nS);
+
+    let nextPlannedEnd = nextType === "custom"
+        ? toDate(nextDate, document.getElementById("nextEnd").value)
+        : toDate(nextDate, nE);
+
+    /* =========================
+       EVENTS EINLESEN
+    ========================= */
+
+    let events = [];
+
+    document.querySelectorAll(".event").forEach(e => {
+        let s = e.querySelector(".start").value;
+        let en = e.querySelector(".end").value;
+
+        if (!s || !en) return;
+
+        events.push({
+            start: new Date(s),
+            end: new Date(en)
+        });
+    });
+
+    events.sort((a, b) => a.start - b.start);
+
+    let firstStart = events.length ? events[0].start : null;
+    let lastEnd = events.length ? events[events.length - 1].end : null;
+
+    /* =========================
+       VALIDATION
+    ========================= */
+
+    let valid = true;
+
+    for (let i = 0; i < events.length; i++) {
+        let e = events[i];
+
+        if (prevEnd && e.start < prevEnd) {
+            log.push("❌ Störung fänkt virun Feierowend vum Dag virdrun un");
+            valid = false;
+        }
+
+        if (nextPlannedStart && e.end > nextPlannedStart) {
+            log.push("❌ Störung hält no geplangtem Ufank vum nächsten Dag op");
+            valid = false;
+        }
+
+        if (e.end < e.start) {
+            log.push("❌ Endzäit läit virun der Startzäit");
+            valid = false;
+        }
+
+        if (i > 0 && e.start < events[i - 1].end) {
+            log.push("❌ Störungen iwwerlappen sech");
+            valid = false;
+        }
+    }
+
+    if (!valid) {
+        document.getElementById("finalStart").value =
+            "FALSCH DONNÉEËN!";
+        document.getElementById("finalEnd").value =
+            "FALSCH DONNÉEËN!";
+        document.getElementById("log").innerText =
+            log.join("\n");
+        return;
+    }
+
+    /* =========================
+       KEINE INTERVENTIONEN
+    ========================= */
+
+    if (events.length === 0) {
+        document.getElementById("finalStart").value =
+            nextPlannedStart.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+        document.getElementById("finalEnd").value =
+            nextPlannedEnd.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+        document.getElementById("log").innerText =
+            "Keine Interventionen.";
+        return;
+    }
+
+    /* =========================
+       BERECHNUNGEN
+    ========================= */
+
+    let interventionHours = events.reduce(
+        (sum, e) => sum + diffHours(e.end, e.start),
+        0
+    );
+
+ let prevStart = prevType === "custom"
+    ? toDate(prevDate, document.getElementById("prevStart").value)
+    : toDate(prevDate, pS);
+
+let prevShiftHours = diffHours(prevEnd, prevStart);
+
+
+    let totalWorked = prevShiftHours + interventionHours;
+
+    let restBefore = diffHours(firstStart, prevEnd);
+    let restAfter = diffHours(nextPlannedStart, lastEnd);
+
+    let fullRest = restBefore >= 10 && restAfter >= 10;
+    let rule14h = totalWorked >= 14;
+
+    log.push("=== REGELIWWERPRÉIFUNG ===");
+    log.push("Repos virun der éischter Störung: " + formatDuration(restBefore));
+    log.push("Repos no der leschter Störung:    " + formatDuration(restAfter));
+    log.push("Insgesamt geschaffte Stonnen:     " + formatDuration(totalWorked));
+    log.push("14 Stonnen Limitt:                " + (rule14h ? "ERRECHT" : "Net errecht"));
+    log.push("10 Stonnen Repos virun an duerno: " + (fullRest ? "Jo" : "Nee"));
+
+    /* =========================
+       FALL 1: GENUG RUHE
+    ========================= */
+
+    if (fullRest) {
+        document.getElementById("finalStart").value =
+            nextPlannedStart.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+        document.getElementById("finalEnd").value =
+            nextPlannedEnd.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+        log.push("🟢 Keng Upassung néideg");
+
+        document.getElementById("log").innerText =
+            log.join("\n");
+        return;
+    }
+
+   /* =========================
+   FALL 2: BERECHNUNG NÄCHSTER TAG
+========================= */
+
+let adjustedStart;
+let adjustedEnd = nextPlannedEnd;
+
+/*
+REGELN:
+
+1. Wenn 14-Stunden-Limit erreicht:
+   → immer 10 Stunden Ruhe nach Ende letzter Störung
+
+2. Wenn weniger als 10 Stunden Ruhe vor der ersten Störung:
+   → ebenfalls 10 Stunden Ruhe nach Ende letzter Störung
+
+3. Wenn mindestens 10 Stunden Ruhe vor der ersten Störung:
+   → 4 Stunden Ruhe nach Ende letzter Störung
+
+4. Falls letzte Störung bis oder über geplanten Arbeitsbeginn geht:
+   → Start bleibt geplante Startzeit
+   → Ende = Start der letzten Störung + 8 Stunden
+*/
+
+if (rule14h) {
+
+    /* 14-Stunden-Limit */
+    adjustedStart = addHours(lastEnd, 10);
+    log.push("14-Stonnen-Limitt → + 10 Stonnen Repos nom Ënn vun leschter Störung");
+
+}
+else if (restBefore < 10) {
+
+    /* Weniger als 10h Ruhe vor erster Intervention */
+    adjustedStart = addHours(lastEnd, 10);
+    log.push("Manner wéi 10 Stonnen Repos virun der éischter Störung → + 10 Stonnen Repos duerno");
+
+}
+else {
+
+    /* Mindestens 10h Ruhe vor erster Intervention */
+    adjustedStart = addHours(lastEnd, 4);
+    log.push("10 Stonnen Repos virun der éischter Störung → + 4 Stonnen Repos");
+
+}
+
+/* Falls letzte Störung bis zum geplanten Arbeitsbeginn oder darüber geht */
+
+if (lastEnd >= nextPlannedStart) {
+
+    let lastEvent = events[events.length - 1];
+
+    adjustedStart = nextPlannedStart;
+    adjustedEnd = addHours(lastEvent.start, 8);
+
+    log.push("Lescht Störung geet bis an d'Schicht eran");
+    log.push("Feierowend = Start vun der leschter Störung + 8 Stonnen");
+}
+
+/* Falls angepasster Start vor geplantem Start liegt,
+   darf frühestens zur geplanten Zeit begonnen werden */
+else if (adjustedStart < nextPlannedStart) {
+    adjustedStart = nextPlannedStart;
+}
+
+    /* =========================
+       DISPENSE COMPLET
+    ========================= */
+
+    let remainingHours = diffHours(adjustedEnd, adjustedStart);
+
+    if (remainingHours < 4) {
+        dispenseComplet = true;
+    }
+
+    /* =========================
+       FORMAT
+    ========================= */
+
+    let format = d =>
+        d.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+    /* =========================
+       AUSGABE
+    ========================= */
+
+    if (rule14h && dispenseComplet) {
+
+        document.getElementById("finalStart").value =
+            "14 STONNEN LIMITT & DISPENSE COMPLET";
+
+        document.getElementById("finalEnd").value =
+            "14 STONNEN LIMITT & DISPENSE COMPLET";
+
+    }
+    else if (dispenseComplet) {
+
+        document.getElementById("finalStart").value =
+            "BRAUCHS NET SCHAFFEN ZE KOMMEN (DISPENSE COMPLET)";
+
+        document.getElementById("finalEnd").value =
+            "BRAUCHS NET SCHAFFEN ZE KOMMEN (DISPENSE COMPLET)";
+
+    }
+    else if (rule14h) {
+
+        document.getElementById("finalStart").value =
+            "14 STONNEN LIMITT – FRÉISTENS UM " +
+            format(adjustedStart) + " SCHAFFE KOMMEN";
+
+        document.getElementById("finalEnd").value =
+            format(adjustedEnd);
+
+    }
+    else {
+
+        document.getElementById("finalStart").value =
+            format(adjustedStart);
+
+        document.getElementById("finalEnd").value =
+            format(adjustedEnd);
+    }
+
+    /* =========================
+       DEBUG LOG
+    ========================= */
+
+    log.push("");
+    log.push("=== RESULTAT ===");
+    log.push("Ugepassten Ufank:       " + format(adjustedStart));
+    log.push("Ugepassten Feierowend:  " + format(adjustedEnd));
+    log.push("Verbleiwend Schaffzäit: " + formatDuration(remainingHours));
+    log.push("Dispense complet:       " + (dispenseComplet ? "JO" : "Nee"));
+
+    document.getElementById("log").innerText =
+        log.join("\n");
+}
+
+
+/* INIT */
+document.getElementById("prevType").addEventListener("change",toggleCustomFields);
+document.getElementById("nextType").addEventListener("change",toggleCustomFields);
+toggleCustomFields();
+
+</script>
+
+</body>
+</html>
