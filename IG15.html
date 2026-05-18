@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <h2>CFL IG15</h2>
-<p class="disclaimer">-ALL BERECHNUNGEN HUNN KENG OFFIZIELL DÉNGSCHTLECH VALABILITÉIT-</p>
+<p class="disclaimer">ALL BERECHNUNGEN HUNN KENG OFFIZIELL DÉNGSCHTLECH VALABILITÉIT</p>
 
 <style>
 
@@ -203,11 +203,11 @@ label {
 ========================= -->
 <div class="card">
 
-<h3>AUERZÄITEN VUN STÖRUNGEN</h3>
+<h3>AUERZÄITEN VUN DEN STÉIERUNGEN</h3>
 
 <div id="events"></div>
 
-<button onclick="addEvent()">+ STÖRUNG</button>
+<button onclick="addEvent()">+ STÉIERUNG BÄIFÜGEN</button>
 
 </div>
 
@@ -308,7 +308,7 @@ function addEvent(){
         <input type="datetime-local" class="end">
 
         <button type="button" class="delete-btn" onclick="this.parentElement.remove()">
-            - STÖRUNG LÄSCHEN
+            - STÉIERUNG LÄSCHEN
         </button>
     `;
 
@@ -428,12 +428,12 @@ function run() {
         let e = events[i];
 
         if (prevEnd && e.start < prevEnd) {
-            log.push("❌ Störung fänkt virun Feierowend vum Dag virdrun un");
+            log.push("❌ Stéierung fänkt virun Feierowend vum Dag virdrun un");
             valid = false;
         }
 
         if (nextPlannedStart && e.end > nextPlannedStart) {
-            log.push("❌ Störung hält no geplangtem Ufank vum nächsten Dag op");
+            log.push("❌ Stéierung hält no geplangtem Ufank vum nächsten Dag op");
             valid = false;
         }
 
@@ -443,7 +443,7 @@ function run() {
         }
 
         if (i > 0 && e.start < events[i - 1].end) {
-            log.push("❌ Störungen iwwerlappen sech");
+            log.push("❌ Stéierungen iwwerlappen sech");
             valid = false;
         }
     }
@@ -505,11 +505,11 @@ let prevShiftHours = diffHours(prevEnd, prevStart);
     let rule14h = totalWorked >= 14;
 
     log.push("=== REGELIWWERPRÉIFUNG ===");
-    log.push("Repos virun der éischter Störung: " + formatDuration(restBefore));
-    log.push("Repos no der leschter Störung:    " + formatDuration(restAfter));
-    log.push("Insgesamt geschaffte Stonnen:     " + formatDuration(totalWorked));
-    log.push("14 Stonnen Limitt:                " + (rule14h ? "ERRECHT" : "Net errecht"));
-    log.push("10 Stonnen Repos virun an duerno: " + (fullRest ? "Jo" : "Nee"));
+    log.push("Repos virun der éischter Stéierung: " + formatDuration(restBefore));
+    log.push("Repos no der leschter Stéierung:    " + formatDuration(restAfter));
+    log.push("Insgesamt geschaffte Stonnen:       " + formatDuration(totalWorked));
+    log.push("14 Stonnen Limitt:                  " + (rule14h ? "ERRECHT" : "Net errecht"));
+    log.push("10 Stonnen Repos virun an duerno:   " + (fullRest ? "Jo" : "Nee"));
 
     /* =========================
        FALL 1: GENUG RUHE
@@ -563,21 +563,21 @@ if (rule14h) {
 
     /* 14-Stunden-Limit */
     adjustedStart = addHours(lastEnd, 10);
-    log.push("14-Stonnen-Limitt → + 10 Stonnen Repos nom Ënn vun leschter Störung");
+    log.push("14-Stonnen-Limitt → + 10 Stonnen Repos nom Ënn vun der leschter Stéierung");
 
 }
 else if (restBefore < 10) {
 
     /* Weniger als 10h Ruhe vor erster Intervention */
     adjustedStart = addHours(lastEnd, 10);
-    log.push("Manner wéi 10 Stonnen Repos virun der éischter Störung → + 10 Stonnen Repos duerno");
+    log.push("Manner wéi 10 Stonnen Repos virun der éischter Stéierung → + 10 Stonnen Repos duerno");
 
 }
 else {
 
     /* Mindestens 10h Ruhe vor erster Intervention */
     adjustedStart = addHours(lastEnd, 4);
-    log.push("10 Stonnen Repos virun der éischter Störung → + 4 Stonnen Repos");
+    log.push("10 Stonnen Repos virun der éischter Stéierung → + 4 Stonnen Repos");
 
 }
 
@@ -590,8 +590,8 @@ if (lastEnd >= nextPlannedStart) {
     adjustedStart = nextPlannedStart;
     adjustedEnd = addHours(lastEvent.start, 8);
 
-    log.push("Lescht Störung geet bis an d'Schicht eran");
-    log.push("Feierowend = Start vun der leschter Störung + 8 Stonnen");
+    log.push("Lescht Stéierung geet bis an d'Schicht eran");
+    log.push("Feierowend = Start vun der leschter Stéierung + 8 Stonnen");
 }
 
 /* Falls angepasster Start vor geplantem Start liegt,
@@ -684,12 +684,16 @@ document.getElementById("nextType").addEventListener("change", toggleCustomField
 // Heutiges Datum
 const today = new Date().toISOString().split("T")[0];
 
-// Beide Felder auf heute setzen
+// Beide Datumsfelder auf heute setzen
 document.getElementById("prevDate").value = today;
 document.getElementById("nextDate").value = today;
 
 // Felder anzeigen/verstecken
 toggleCustomFields();
+
+// Sofort eine erste Störung anzeigen
+addEvent();
+
 
 </script>
 
