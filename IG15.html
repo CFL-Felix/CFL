@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <h2>CFL IG15</h2>
-<p class="disclaimer">ALL DONNÉEËN & BERECHNUNGEN OUNI GARANTIE</p>
+<p class="disclaimer">-ALL DONNÉEËN & BERECHNUNGEN OUNI GARANTIE-</p>
 
 <style>
 
@@ -175,10 +175,7 @@ label {
      VORTAG
 ========================= -->
 <div class="card">
-<h3>SCHAFFZÄITEN VUM DAG VIRDRUN</h3>
-
-<label>Datum</label>
-<input id="prevDate" type="date">
+<h3>SCHAFFZÄITEN VUM LESCHTE SCHAFFDAG</h3>
 
 <label>Auerzäit</label>
 <select id="prevType">
@@ -187,15 +184,18 @@ label {
 <option value="custom">Benotzerdefinéiert</option>
 </select>
 
+<div id="prevDateBox" class="custom-box">
+    <label>Datum</label>
+    <input id="prevDate" type="date">
+</div>
 
 <div id="prevCustomFields" class="custom-box hidden">
     <label>UFANK</label>
-    <input id="prevStart" type="time">
+    <input id="prevStart" type="datetime-local">
 
     <label>FEIEROWEND</label>
-    <input id="prevEnd" type="time">
+    <input id="prevEnd" type="datetime-local">
 </div>
-
 </div>
 
 <!-- =========================
@@ -215,11 +215,7 @@ label {
      NÄCHSTER TAG
 ========================= -->
 <div class="card">
-
-<h3>SCHAFFZÄITEN VUM DAG DROP</h3>
-
-<label>Datum</label>
-<input id="nextDate" type="date">
+<h3>SCHAFFZÄITEN VUM NÄCHSTEN SCHAFFDAG</h3>
 
 <label>Auerzäit</label>
 <select id="nextType">
@@ -228,16 +224,19 @@ label {
 <option value="custom">Benotzerdefinéiert</option>
 </select>
 
+<div id="nextDateBox" class="custom-box">
+    <label>Datum</label>
+    <input id="nextDate" type="date">
+</div>
+
 <div id="nextCustomFields" class="custom-box hidden">
     <label>UFANK</label>
-    <input id="nextStart" type="time">
+    <input id="nextStart" type="datetime-local">
 
     <label>FEIEROWEND</label>
-    <input id="nextEnd" type="time">
+    <input id="nextEnd" type="datetime-local">
 </div>
-
 </div>
-
 <!-- =========================
      BUTTON
 ========================= -->
@@ -254,7 +253,7 @@ label {
 <label>UFÄNKEN UM</label>
 <input id="finalStart" type="text" readonly>
 
-<label>FEIEROWEND</label>
+<label>FEIEROWEND UM</label>
 <input id="finalEnd" type="text" readonly>
 </div>
 
@@ -315,17 +314,24 @@ function addEvent(){
 
     document.getElementById("events").appendChild(div);
 }
-function toggleCustomFields(){
 
-    document.getElementById("prevCustomFields").classList.toggle(
-        "hidden",
-        document.getElementById("prevType").value !== "custom"
-    );
+function toggleCustomFields() {
+    const prevCustom = document.getElementById("prevType").value === "custom";
+    const nextCustom = document.getElementById("nextType").value === "custom";
 
-    document.getElementById("nextCustomFields").classList.toggle(
-        "hidden",
-        document.getElementById("nextType").value !== "custom"
-    );
+    // Vortag
+    document.getElementById("prevCustomFields")
+        .classList.toggle("hidden", !prevCustom);
+
+    document.getElementById("prevDateBox")
+        .classList.toggle("hidden", prevCustom);
+
+    // Nächster Tag
+    document.getElementById("nextCustomFields")
+        .classList.toggle("hidden", !nextCustom);
+
+    document.getElementById("nextDateBox")
+        .classList.toggle("hidden", nextCustom);
 }
 
 function formatDuration(hours) {
@@ -378,16 +384,16 @@ function run() {
     let [nS, nE] = shift(nextType);
 
     let prevEnd = prevType === "custom"
-        ? toDate(prevDate, document.getElementById("prevEnd").value)
-        : toDate(prevDate, pE);
+    ? new Date(document.getElementById("prevEnd").value)
+    : toDate(prevDate, pE);
 
     let nextPlannedStart = nextType === "custom"
-        ? toDate(nextDate, document.getElementById("nextStart").value)
-        : toDate(nextDate, nS);
+    ? new Date(document.getElementById("nextStart").value)
+    : toDate(nextDate, nS);
 
     let nextPlannedEnd = nextType === "custom"
-        ? toDate(nextDate, document.getElementById("nextEnd").value)
-        : toDate(nextDate, nE);
+    ? new Date(document.getElementById("nextEnd").value)
+    : toDate(nextDate, nE);
 
     /* =========================
        EVENTS EINLESEN
@@ -484,7 +490,7 @@ function run() {
     );
 
  let prevStart = prevType === "custom"
-    ? toDate(prevDate, document.getElementById("prevStart").value)
+    ? new Date(document.getElementById("prevStart").value)
     : toDate(prevDate, pS);
 
 let prevShiftHours = diffHours(prevEnd, prevStart);
@@ -630,10 +636,10 @@ else if (adjustedStart < nextPlannedStart) {
     else if (dispenseComplet) {
 
         document.getElementById("finalStart").value =
-            "BRAUCHS NET SCHAFFEN ZE KOMMEN (DISPENSE COMPLET)";
+            "DISPENSE COMPLET (BRAUCHS NET SCHAFFEN ZE KOMMEN)";
 
         document.getElementById("finalEnd").value =
-            "BRAUCHS NET SCHAFFEN ZE KOMMEN (DISPENSE COMPLET)";
+            "DISPENSE COMPLET (BRAUCHS NET SCHAFFEN ZE KOMMEN)";
 
     }
     else if (rule14h) {
@@ -672,8 +678,17 @@ else if (adjustedStart < nextPlannedStart) {
 
 
 /* INIT */
-document.getElementById("prevType").addEventListener("change",toggleCustomFields);
-document.getElementById("nextType").addEventListener("change",toggleCustomFields);
+document.getElementById("prevType").addEventListener("change", toggleCustomFields);
+document.getElementById("nextType").addEventListener("change", toggleCustomFields);
+
+// Heutiges Datum
+const today = new Date().toISOString().split("T")[0];
+
+// Beide Felder auf heute setzen
+document.getElementById("prevDate").value = today;
+document.getElementById("nextDate").value = today;
+
+// Felder anzeigen/verstecken
 toggleCustomFields();
 
 </script>
