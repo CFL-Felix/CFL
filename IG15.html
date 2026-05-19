@@ -215,7 +215,7 @@ label {
      NÄCHSTER TAG
 ========================= -->
 <div class="card">
-<h3>SCHAFFZÄITEN VUM NÄCHSTEN SCHAFFDAG</h3>
+<h3>GEPLANGTE SCHAFFZÄITEN VUM NÄCHSTEN SCHAFFDAG</h3>
 
 <label>Auerzäit</label>
 <select id="nextType">
@@ -248,7 +248,7 @@ label {
      RESULT
 ========================= -->
 <div class="card">
-<h3>UGEPASSTE SCHAFFZÄITEN</h3>
+<h3>UGEPASSTE SCHAFFZÄITEN VUM NÄCHSTEN SCHAFFDAG</h3>
 
 <label>UFÄNKEN UM</label>
 <input id="finalStart" type="text" readonly>
@@ -681,12 +681,57 @@ else if (adjustedStart < nextPlannedStart) {
 document.getElementById("prevType").addEventListener("change", toggleCustomFields);
 document.getElementById("nextType").addEventListener("change", toggleCustomFields);
 
-// Heutiges Datum
-const today = new Date().toISOString().split("T")[0];
+/* =========================
+   AUTOMATISCHE DATUMSWAHL
+========================= */
 
-// Beide Datumsfelder auf heute setzen
-document.getElementById("prevDate").value = today;
-document.getElementById("nextDate").value = today;
+const now = new Date();
+
+// Hilfsfunktion: Datum im Format YYYY-MM-DD
+function formatDate(date) {
+    return date.toISOString().split("T")[0];
+}
+
+// Gestern und Morgen berechnen
+const yesterday = new Date(now);
+yesterday.setDate(now.getDate() - 1);
+
+const tomorrow = new Date(now);
+tomorrow.setDate(now.getDate() + 1);
+
+// Aktuelle Uhrzeit als Dezimalzahl (z.B. 19.5 = 19:30)
+const currentHour = now.getHours() + now.getMinutes() / 60;
+
+/*
+REGELN:
+
+19:00 bis 23:59
+→ Vortag = heute
+→ Nächster Tag = morgen
+
+00:00 bis 07:00
+→ Vortag = gestern
+→ Nächster Tag = heute
+
+Alle anderen Zeiten
+→ Beide Felder = heute
+*/
+
+if (currentHour >= 19) {
+    // Abend
+    document.getElementById("prevDate").value = formatDate(now);
+    document.getElementById("nextDate").value = formatDate(tomorrow);
+
+} else if (currentHour =< 7) {
+    // Nacht / früher Morgen
+    document.getElementById("prevDate").value = formatDate(yesterday);
+    document.getElementById("nextDate").value = formatDate(now);
+
+} else {
+    // Standardfall tagsüber
+    document.getElementById("prevDate").value = formatDate(now);
+    document.getElementById("nextDate").value = formatDate(now);
+}
 
 // Felder anzeigen/verstecken
 toggleCustomFields();
