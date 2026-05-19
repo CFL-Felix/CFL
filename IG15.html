@@ -722,7 +722,7 @@ if (currentHour >= 19) {
     document.getElementById("prevDate").value = formatDate(now);
     document.getElementById("nextDate").value = formatDate(tomorrow);
 
-} else if (currentHour =< 7) {
+} else if (currentHour <= 7) {
     // Nacht / früher Morgen
     document.getElementById("prevDate").value = formatDate(yesterday);
     document.getElementById("nextDate").value = formatDate(now);
