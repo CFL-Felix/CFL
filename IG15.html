@@ -13,6 +13,7 @@
    BASE LAYOUT
 ========================= */
 
+
 body {
     font-family: Arial;
     background:#f4f6f8;
@@ -42,6 +43,36 @@ body {
     flex-direction:column;
     gap:12px;
 }
+
+/* =========================
+   BACKGROUND
+========================= */
+.card-prev {
+    background: #eff6ff;
+    border: 2px solid #bfdbfe;
+}
+
+.card-events {
+    background: #fef2f2;   /* sehr helles Rot */
+    border: 2px solid #f87171;   /* kräftiges Rot */
+}
+
+.card-next {
+    background: #fef7ed;   /* sehr helles Beige / Sand */
+    border: 2px solid #d6b38a;   /* warmes Hellbraun */
+}
+
+.card-result {
+    background: #f5f3ff;
+    border: 2px solid #c4b5fd;
+}
+
+.card-prev h3 { color: #1d4ed8; }
+.card-events h3 { color: #b91c1c; }
+.card-next h3 { color: #8b5e3c; }
+.card-result h3 { color: #6d28d9; }
+
+
 
 /* =========================
    TYPO
@@ -152,7 +183,7 @@ pre {
     border-radius:10px;
     max-height:500px;
     overflow:auto;
-    font-size:14px;
+    font-size:10px;
 }
 
 label {
@@ -174,7 +205,7 @@ label {
 <!-- =========================
      VORTAG
 ========================= -->
-<div class="card">
+<div class="card card-prev">
 <h3>SCHAFFZÄITEN VUM LESCHTE SCHAFFDAG</h3>
 
 <label>Auerzäit</label>
@@ -201,7 +232,7 @@ label {
 <!-- =========================
      INTERVENTIONEN
 ========================= -->
-<div class="card">
+<div class="card card-events">
 
 <h3>AUERZÄITEN VUN DEN STÉIERUNGEN</h3>
 
@@ -214,7 +245,7 @@ label {
 <!-- =========================
      NÄCHSTER TAG
 ========================= -->
-<div class="card">
+<div class="card card-next">
 <h3>GEPLANGTE SCHAFFZÄITEN VUM NÄCHSTEN SCHAFFDAG</h3>
 
 <label>Auerzäit</label>
@@ -247,7 +278,7 @@ label {
 <!-- =========================
      RESULT
 ========================= -->
-<div class="card">
+<div class="card card-result">
 <h3>UGEPASSTE SCHAFFZÄITEN VUM NÄCHSTEN SCHAFFDAG</h3>
 
 <label>UFÄNKEN UM</label>
