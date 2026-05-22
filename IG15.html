@@ -577,6 +577,7 @@ let prevShiftHours = diffHours(prevEnd, prevStart);
 
 let adjustedStart;
 let adjustedEnd = nextPlannedEnd;
+let overlapShift = false;
 
 /*
 REGELN:
@@ -626,6 +627,8 @@ if (lastEnd >= nextPlannedStart) {
     adjustedStart = nextPlannedStart;
     adjustedEnd = addHours(lastEvent.start, 8);
 
+    overlapShift = true;
+
     log.push("Lescht Stéierung geet bis an d'Schicht eran");
     log.push("Feierowend = Start vun der leschter Stéierung + 8 Stonnen");
 }
@@ -642,9 +645,9 @@ else if (adjustedStart < nextPlannedStart) {
 
     let remainingHours = diffHours(adjustedEnd, adjustedStart);
 
-    if (remainingHours < 4) {
-        dispenseComplet = true;
-    }
+   if (!overlapShift && remainingHours < 4) {
+    dispenseComplet = true;
+}
 
     /* =========================
        FORMAT
