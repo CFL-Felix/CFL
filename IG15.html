@@ -48,18 +48,19 @@ body {
    BACKGROUND
 ========================= */
 .card-prev {
-    background: #fef7ed;   /* sehr helles Beige / Sand */
-    border: 2px solid #d6b38a;   /* warmes Hellbraun */
-}
-
-.card-events {
-    background: #fef2f2;   /* sehr helles Rot */
-    border: 2px solid #f87171;   /* kräftiges Rot */
+background: #F9FAFB;
+border: 2px solid #CCCCCC;
 }
 
 .card-next {
-    background: #fef7ed;   /* sehr helles Beige / Sand */
-    border: 2px solid #d6b38a;   /* warmes Hellbraun */
+background: #F9FAFB;
+border: 2px solid #CCCCCC;
+}
+
+.card-events {
+    background: #F9FAFB;
+/* #fef2f2; */   /* sehr helles Rot */
+    border: 2px solid #f87171;   /* kräftiges Rot */
 }
 
 .card-result {
@@ -67,10 +68,13 @@ body {
     border: 2px solid #c4b5fd;
 }
 
-.card-prev h3 { color: #8b5e3c; }
-.card-events h3 { color: #b91c1c; }
-.card-next h3 { color: #8b5e3c; }
-.card-result h3 { color: #6d28d9; }
+.card-prev h3 { color: #000000; }
+.card-events h3 { color: #000000; }
+/* Altternative: color: #b91c1c; */
+.card-next h3 { color: #000000; }
+/* Altternative: color: #8b5e3c */
+.card-result h3 { color: #000000; }
+/* Altternative: color: #6d28d9 */
 
 
 
@@ -232,19 +236,6 @@ label {
 </div>
 
 <!-- =========================
-     INTERVENTIONEN
-========================= -->
-<div class="card card-events">
-
-<h3>AUERZÄITEN VUN DEN STÉIERUNGEN</h3>
-
-<div id="events"></div>
-
-<button onclick="addEvent()">+ STÉIERUNG BÄIFÜGEN</button>
-
-</div>
-
-<!-- =========================
      NÄCHSTER TAG
 ========================= -->
 <div class="card card-next">
@@ -270,6 +261,20 @@ label {
     <input id="nextEnd" type="datetime-local">
 </div>
 </div>
+
+<!-- =========================
+     INTERVENTIONEN
+========================= -->
+<div class="card card-events">
+
+<h3>AUERZÄITEN VUN DEN STÉIERUNGEN</h3>
+
+<div id="events"></div>
+
+<button onclick="addEvent()">+ STÉIERUNG BÄIFÜGEN</button>
+
+</div>
+
 
 <!-- =========================
      RESULT
