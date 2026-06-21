@@ -220,6 +220,7 @@ label {
 <select id="prevType">
 <option value="normal">Normalschicht (7–15)</option>
 <option value="mittag">Mëttegschicht (11–19)</option>
+<option value="summer">Summerschicht (6–14)</option>
 <option value="custom">Benotzerdefinéiert</option>
 </select>
 
@@ -247,6 +248,7 @@ label {
 <select id="nextType">
 <option value="normal">Normalschicht (7–15)</option>
 <option value="mittag">Mëttegschicht (11–19)</option>
+<option value="summer">Summerschicht (6–14)</option>
 <option value="custom">Benotzerdefinéiert</option>
 </select>
 
@@ -322,6 +324,7 @@ function diffHours(a,b){
 function shift(type){
     if(type==="normal") return ["07:00","15:00"];
     if(type==="mittag") return ["11:00","19:00"];
+    if(type==="summer") return ["06:00","14:00"];
     return [null,null];
 }
 
